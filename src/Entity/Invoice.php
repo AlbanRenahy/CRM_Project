@@ -2,11 +2,26 @@
 
 namespace App\Entity;
 
-use App\Repository\InvoiceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\InvoiceRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
+ * @ApiResource(
+ * attributes={
+ *    "pagination_enabled"=true,
+ *    "pagination_items_per_page"=20,
+ *    "order": {"amount": "desc"}
+ *  }, 
+ * normalizationContext={
+ *    "groups"={"invoices_read"}
+ *  }
+ * )
+ * @ApiFilter(OrderFilter::class)
  */
 class Invoice
 {
@@ -14,34 +29,49 @@ class Invoice
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"invoices_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $amount;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $sentAt;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="invoices")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoices_read"})
      */
     private $customer;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $chrono;
+
+    /**
+     * Retrieve the user who owns the invoice
+     * @Groups({"invoices_read"})
+     * @return User
+     */
+    public function getUser(): User {
+        return $this->customer->getUser();
+    }
 
     public function getId(): ?int
     {
