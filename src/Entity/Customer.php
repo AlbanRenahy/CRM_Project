@@ -76,7 +76,6 @@ class Customer
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
      * @Groups({"customers_read"})
-     * @Assert\NotBlank
      */
     private $user;
 
