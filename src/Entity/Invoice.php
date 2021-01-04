@@ -7,6 +7,7 @@ use App\Repository\InvoiceRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
@@ -23,8 +24,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *    "order": {"amount": "desc"}
  *  }, 
  * normalizationContext={
- *    "groups"={"invoices_read"}
- *  }
+ *    "groups"={"invoices_read"},
+ *  },
+ * denormalizationContext={"disable_type_enforcement"=true}
  * )
  * @ApiFilter(OrderFilter::class)
  */
@@ -41,18 +43,24 @@ class Invoice
     /**
      * @ORM\Column(type="float")
      * @Groups({"invoices_read", "customers_read", "invoices_subresource"})
+     * @Assert\NotBlank
+     * @Assert\Type(type="numeric", message="Le montant de la facture doit être numérique")
      */
     private $amount;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"invoices_read", "customers_read", "invoices_subresource"})
+     * @Assert\Type("\DateTimeInterface")
+     * @Assert\NotBlank
      */
     private $sentAt;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"invoices_read", "customers_read"})
+     * @Assert\NotBlank
+     * @Assert\Choice(choices={"SENT", "PAID", "CANCELLED"}, message="Le statut doit être sent, paid ou cancelled")
      */
     private $status;
 
@@ -66,12 +74,14 @@ class Invoice
     /**
      * @ORM\Column(type="integer")
      * @Groups({"invoices_read", "customers_read", "invoices_subresource"})
+     * @Assert\NotBlank
      */
     private $chrono;
 
     /**
      * Retrieve the user who owns the invoice
      * @Groups({"invoices_read", "invoices_subresource"})
+     * @Assert\NotBlank
      * @return User
      */
     public function getUser(): User {
@@ -88,7 +98,7 @@ class Invoice
         return $this->amount;
     }
 
-    public function setAmount(float $amount): self
+    public function setAmount($amount): self
     {
         $this->amount = $amount;
 
@@ -100,7 +110,7 @@ class Invoice
         return $this->sentAt;
     }
 
-    public function setSentAt(\DateTimeInterface $sentAt): self
+    public function setSentAt($sentAt): self
     {
         $this->sentAt = $sentAt;
 

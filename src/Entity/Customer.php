@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
@@ -39,18 +40,23 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank
+     * @Assert\Length(min=3, minMessage="The firstname needs to have between 3 and 255 caracters", max=255, maxMessage="The  firstname needs to have between 3 and 255 caracters")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank
+     * @Assert\Length(min=3, minMessage="The lastname needs to have between 3 and 255 caracters", max=255, maxMessage="The  lastname needs to have between 3 and 255 caracters")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank
      */
     private $email;
 
@@ -70,6 +76,7 @@ class Customer
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
      * @Groups({"customers_read"})
+     * @Assert\NotBlank
      */
     private $user;
 
@@ -96,7 +103,7 @@ class Customer
      *
      * @return float
      */
-    public function getUnpaidAmount(): float
+    public function getUnpaidAmount(): ?float
     {
         return array_reduce($this->invoices->toArray(), function ($total, $invoice) {
             return $total + ($invoice->getStatus() === "PAID" || $invoice->getStatus() === "CANCELLED" ? 0 : $invoice->getAmount());
