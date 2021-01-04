@@ -52,7 +52,6 @@ class Invoice
      * @ORM\Column(type="datetime")
      * @Groups({"invoices_read", "customers_read", "invoices_subresource"})
      * @Assert\Type("\DateTimeInterface")
-     * @Assert\NotBlank
      */
     private $sentAt;
 
@@ -74,7 +73,6 @@ class Invoice
     /**
      * @ORM\Column(type="integer")
      * @Groups({"invoices_read", "customers_read", "invoices_subresource"})
-     * @Assert\NotBlank
      */
     private $chrono;
 
