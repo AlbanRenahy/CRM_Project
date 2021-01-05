@@ -6,7 +6,8 @@ import "./styles/app.css";
 import "./bootstrap";
 import Navbar from "./js/components/NavBar";
 import HomePage from "./js/pages/HomePage";
-import CustomersPage from './js/pages/CustomersPage';
+import CustomersPage from "./js/pages/CustomersPage";
+import InvoicesPage from "./js/pages/InvoicesPage";
 
 const App = () => {
   return (
@@ -14,10 +15,11 @@ const App = () => {
       <Navbar />
 
       <main className="container pt-5">
-          <Switch>
-              <Route path="/customers" component={CustomersPage} />
-              <Route path="/" component={HomePage} />
-          </Switch>
+        <Switch>
+          <Route path="/invoices" component={InvoicesPage} />
+          <Route path="/customers" component={CustomersPage} />
+          <Route path="/" component={HomePage} />
+        </Switch>
       </main>
     </HashRouter>
   );
