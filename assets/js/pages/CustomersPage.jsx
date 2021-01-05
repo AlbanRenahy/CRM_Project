@@ -4,13 +4,29 @@ import axios from "axios";
 const CustomersPage = (props) => {
   const [customers, setCustomers] = useState([]);
 
+  // Get list of customers from api
   useEffect(() => {
     axios
       .get("https://127.0.0.1:8001/api/customers")
       .then((response) => response.data["hydra:member"])
-      .then(data => setCustomers(data))
-      .catch(error => console.log(error.response));
+      .then((data) => setCustomers(data))
+      .catch((error) => console.log(error.response));
   }, []);
+
+  // Handle delete of one customer without invoices
+  const handleDelete = (id) => {
+    const originalCustomers = [...customers];
+
+    setCustomers(customers.filter((customer) => customer.id !== id));
+
+    axios
+      .delete("https://127.0.0.1:8001/api/customers/" + id)
+      .then((response) => console.log("ok"))
+      .catch((error) => {
+        setCustomers(originalCustomers);
+        console.log(error.response);
+      });
+  };
 
   return (
     <>
@@ -28,20 +44,32 @@ const CustomersPage = (props) => {
           </tr>
         </thead>
         <tbody>
-          {customers.map(customer => (
+          {customers.map((customer) => (
             <tr key={customer.id}>
               <td>{customer.id}</td>
               <td>
-                <a href="#">{customer.firstName} {customer.lastName}</a>
+                <a href="#">
+                  {customer.firstName} {customer.lastName}
+                </a>
               </td>
               <td>{customer.email}</td>
               <td>{customer.company}</td>
               <td className="text-center">
-                <span className="badge badge-primary">{customer.invoices.length}</span>
+                <span className="badge badge-primary">
+                  {customer.invoices.length}
+                </span>
               </td>
-              <td className="text-center">{customer.totalAmount.toLocaleString()} €</td>
+              <td className="text-center">
+                {customer.totalAmount.toLocaleString()} €
+              </td>
               <td>
-                <button className="btn btn-sm btn-danger">Supprmier</button>
+                <button
+                  onClick={() => handleDelete(customer.id)}
+                  disabled={customer.invoices.length > 0}
+                  className="btn btn-sm btn-danger"
+                >
+                  Supprmier
+                </button>
               </td>
             </tr>
           ))}
