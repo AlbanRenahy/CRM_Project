@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import ReactDOM from "react-dom";
 /*
  * Welcome to your app's main JavaScript file!
@@ -8,14 +8,24 @@ import ReactDOM from "react-dom";
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
+import "./styles/app.css";
 
 // start the Stimulus application
-import './bootstrap';
+import "./bootstrap";
+import Navbar from "./js/components/NavBar";
+import HomePage from "./js/pages/HomePage";
 
 const App = () => {
-    return <h1>Bonjour à tous !</h1>
-}
+  return (
+    <>
+      <Navbar />
 
-const rootElement = document.querySelector('#app');
-ReactDOM.render(<App/>, rootElement);
+      <div className="container pt-5">
+        <HomePage />
+      </div>
+    </>
+  );
+};
+
+const rootElement = document.querySelector("#app");
+ReactDOM.render(<App />, rootElement);
