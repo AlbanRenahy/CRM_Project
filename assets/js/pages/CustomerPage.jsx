@@ -12,7 +12,7 @@ const CustomerPage = (props) => {
   });
 
   const [errors, setErrors] = useState({
-    lastName: "Le nom est obligatoire",
+    lastName: "",
     firstName: "",
     email: "",
     company: "",
@@ -27,9 +27,16 @@ const CustomerPage = (props) => {
     event.preventDefault();
     try {
         const response = await axios.post("https://127.0.0.1:8001/api/customers", customer)
+        setErrors({});
         console.log(response.data)
     } catch(error) {
-        console.log(error.response)
+        if(error.response.data.violations) {
+            const apiErrors = {};
+            error.response.data.violations.forEach(violation => {
+                apiErrors[violation.propertyPath] = violation.message;
+            });
+            setErrors(apiErrors);
+        }
     }
   };
 
