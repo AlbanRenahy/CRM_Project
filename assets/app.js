@@ -1,11 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import {
   HashRouter,
   Switch,
   Route,
   withRouter,
-  Redirect,
 } from "react-router-dom";
 import "./styles/app.css";
 
@@ -17,17 +16,9 @@ import InvoicesPage from "./js/pages/InvoicesPage";
 import LoginPage from "./js/pages/LoginPage";
 import AuthAPI from "./js/services/authAPI";
 import AuthContext from "./js/contexts/AuthContext";
+import PrivateRoute from './js/components/PrivateRoute';
 
 AuthAPI.setup();
-
-const PrivateRoute = ({ path, component }) => {
-  const { isAuthenticated } = useContext(AuthContext);
-  return isAuthenticated ? (
-    <Route path={path} component={component} />
-  ) : (
-    <Redirect to="/login" />
-  );
-};
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -36,13 +27,11 @@ const App = () => {
 
   const NavbarWithRouter = withRouter(Navbar);
 
-  const contextValue = {
-    isAuthenticated,
-    setIsAuthenticated,
-  };
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      setIsAuthenticated,
+    }}>
       <HashRouter>
         <NavbarWithRouter />
 
