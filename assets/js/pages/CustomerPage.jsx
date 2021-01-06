@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Field from "../components/forms/Field";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import CustomersAPI from "../services/customersAPI";
 
-const CustomerPage = (props) => {
-  const { id = "new" } = props.match.params;
+const CustomerPage = ({ match, history }) => {
+  const { id = "new" } = match.params;
 
   const [customer, setCustomer] = useState({
     lastName: "",
@@ -22,17 +22,21 @@ const CustomerPage = (props) => {
 
   const [editing, setEditing] = useState(false);
 
+  // Retrieve customer from id
   const fetchCustomer = async (id) => {
     try {
-      const data = await axios
-        .get("https://127.0.0.1:8001/api/customers/" + id)
-        .then((response) => response.data);
-      const { firstName, lastName, email, company } = data;
+      const { firstName, lastName, email, company } = await CustomersAPI.find(
+        id
+      );
       setCustomer({ firstName, lastName, email, company });
     } catch (error) {
       console.log(error.response);
+      // TODO: error flash notif
+      history.replace("/customers");
     }
   };
+
+  // Load customer if needed on component init or id init
   useEffect(() => {
     if (id !== "new") {
       setEditing(true);
@@ -40,35 +44,33 @@ const CustomerPage = (props) => {
     }
   }, [id]);
 
+  // Handle inputs change on form
   const handleChange = ({ currentTarget }) => {
     const { name, value } = currentTarget;
     setCustomer({ ...customer, [name]: value });
   };
 
+  // Handle form submit
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     try {
       if (editing) {
-        const response = await axios.put(
-          "https://127.0.0.1:8001/api/customers/" + id,
-          customer
-        );
+        await CustomersAPI.update(id, customer);
         //TODO: Flash success notification
       } else {
-        const response = await axios.post(
-          "https://127.0.0.1:8001/api/customers",
-          customer
-        );
+        await CustomersAPI.create(customer);
 
         // TODO: Flash success notification
-        props.history.replace("/customers");
+        history.replace("/customers");
       }
       setErrors({});
-    } catch (error) {
-      if (error.response.data.violations) {
+    } catch ({ response }) {
+      const { violations } = response.data;
+      if (violations) {
         const apiErrors = {};
-        error.response.data.violations.forEach((violation) => {
-          apiErrors[violation.propertyPath] = violation.message;
+        violations.forEach(({propertyPath, message}) => {
+          apiErrors[propertyPath] = message;
         });
         setErrors(apiErrors);
         // TODO: Flash errors notification

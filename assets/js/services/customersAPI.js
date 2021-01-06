@@ -7,11 +7,27 @@ function findAll() {
 }
 
 function deleteCustomer(id) {
+  return axios.delete("https://127.0.0.1:8001/api/customers/" + id);
+}
+
+function find(id) {
   return axios
-  .delete("https://127.0.0.1:8001/api/customers/" + id);
+    .get("https://127.0.0.1:8001/api/customers/" + id)
+    .then((response) => response.data);
+}
+
+function update(id, customer) {
+  return axios.put("https://127.0.0.1:8001/api/customers/" + id, customer);
+}
+
+function create(customer) {
+  axios.post("https://127.0.0.1:8001/api/customers", customer);
 }
 
 export default {
   findAll,
-  delete: deleteCustomer
+  delete: deleteCustomer,
+  find,
+  update,
+  create
 };
