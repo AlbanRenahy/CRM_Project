@@ -33,13 +33,29 @@ function setup() {
   if (token) {
     const { exp: expiration } = jwtDecode(token);
     if (expiration * 1000 > new Date().getTime()) {
-        setAxiosToken(token);
+      setAxiosToken(token);
     }
   }
+}
+
+function isAuthenticated() {
+  //1. See if we have a token
+  const token = window.localStorage.getItem("authToken");
+
+  //2. If token is valid
+  if (token) {
+    const { exp: expiration } = jwtDecode(token);
+    if (expiration * 1000 > new Date().getTime()) {
+      return true;
+    }
+    return false;
+  }
+  return false;
 }
 
 export default {
   authenticate,
   logout,
   setup,
+  isAuthenticated
 };
