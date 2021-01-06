@@ -1,5 +1,6 @@
 import React from "react";
 import AuthAPI from "../services/authAPI";
+import { NavLink } from "react-router-dom";
 
 const Navbar = (props) => {
 
@@ -9,9 +10,9 @@ const Navbar = (props) => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a className="navbar-brand" href="#">
+      <NavLink className="navbar-brand" to="#">
         EasyFacture
-      </a>
+      </NavLink>
       <button
         className="navbar-toggler"
         type="button"
@@ -27,26 +28,26 @@ const Navbar = (props) => {
       <div className="collapse navbar-collapse" id="navbarColor01">
         <ul className="navbar-nav mr-auto">
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink className="nav-link" to="/customers">
               Clients
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink className="nav-link" to="/invoices">
               Factures
-            </a>
+            </NavLink>
           </li>
         </ul>
         <ul className="navbar-nav ml-auto">
           <li className="nav-item">
-            <a href="#" className="nav-link">
+            <NavLink to="/register" className="nav-link">
               Inscription
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a href="#" className="btn btn-success">
+            <NavLink to="/login" className="btn btn-success">
               Connexion !
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
             <button onClick={handleLogout} href="#" className="btn btn-danger">
