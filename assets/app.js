@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ReactDOM from "react-dom";
 import {
   HashRouter,
@@ -16,15 +16,18 @@ import CustomersPage from "./js/pages/CustomersPage";
 import InvoicesPage from "./js/pages/InvoicesPage";
 import LoginPage from "./js/pages/LoginPage";
 import AuthAPI from "./js/services/authAPI";
+import AuthContext from "./js/contexts/AuthContext";
 
 AuthAPI.setup();
 
-const PrivateRoute = ({ path, isAuthenticated, component }) =>
-  isAuthenticated ? (
+const PrivateRoute = ({ path, component }) => {
+  const { isAuthenticated } = useContext(AuthContext);
+  return isAuthenticated ? (
     <Route path={path} component={component} />
   ) : (
     <Redirect to="/login" />
   );
+};
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -33,35 +36,26 @@ const App = () => {
 
   const NavbarWithRouter = withRouter(Navbar);
 
-  return (
-    <HashRouter>
-      <NavbarWithRouter
-        isAuthenticated={isAuthenticated}
-        onLogout={setIsAuthenticated}
-      />
+  const contextValue = {
+    isAuthenticated,
+    setIsAuthenticated,
+  };
 
-      <main className="container pt-5">
-        <Switch>
-          <Route
-            path="/login"
-            render={(props) => (
-              <LoginPage onLogin={setIsAuthenticated} {...props} />
-            )}
-          />
-          <PrivateRoute
-            path="/invoices"
-            isAuthenticated={isAuthenticated}
-            component={InvoicesPage}
-          />
-          <PrivateRoute
-            path="/customers"
-            isAuthenticated={isAuthenticated}
-            component={CustomersPage}
-          />
-          <Route path="/" component={HomePage} />
-        </Switch>
-      </main>
-    </HashRouter>
+  return (
+    <AuthContext.Provider value={contextValue}>
+      <HashRouter>
+        <NavbarWithRouter />
+
+        <main className="container pt-5">
+          <Switch>
+            <Route path="/login" component={LoginPage} />
+            <PrivateRoute path="/invoices" component={InvoicesPage} />
+            <PrivateRoute path="/customers" component={CustomersPage} />
+            <Route path="/" component={HomePage} />
+          </Switch>
+        </main>
+      </HashRouter>
+    </AuthContext.Provider>
   );
 };
 
