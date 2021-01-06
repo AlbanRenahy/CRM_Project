@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { HashRouter, Switch, Route, withRouter } from "react-router-dom";
+import {
+  HashRouter,
+  Switch,
+  Route,
+  withRouter,
+  Redirect,
+} from "react-router-dom";
 import "./styles/app.css";
 
 import "./bootstrap";
@@ -13,23 +19,45 @@ import AuthAPI from "./js/services/authAPI";
 
 AuthAPI.setup();
 
+const PrivateRoute = ({ path, isAuthenticated, component }) =>
+  isAuthenticated ? (
+    <Route path={path} component={component} />
+  ) : (
+    <Redirect to="/login" />
+  );
+
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(AuthAPI.isAuthenticated());
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    AuthAPI.isAuthenticated()
+  );
 
   const NavbarWithRouter = withRouter(Navbar);
 
   return (
     <HashRouter>
-      <NavbarWithRouter isAuthenticated={isAuthenticated} onLogout={setIsAuthenticated} />
+      <NavbarWithRouter
+        isAuthenticated={isAuthenticated}
+        onLogout={setIsAuthenticated}
+      />
 
       <main className="container pt-5">
         <Switch>
           <Route
             path="/login"
-            render={(props) => <LoginPage onLogin={setIsAuthenticated} {...props} />}
+            render={(props) => (
+              <LoginPage onLogin={setIsAuthenticated} {...props} />
+            )}
           />
-          <Route path="/invoices" component={InvoicesPage} />
-          <Route path="/customers" component={CustomersPage} />
+          <PrivateRoute
+            path="/invoices"
+            isAuthenticated={isAuthenticated}
+            component={InvoicesPage}
+          />
+          <PrivateRoute
+            path="/customers"
+            isAuthenticated={isAuthenticated}
+            component={CustomersPage}
+          />
           <Route path="/" component={HomePage} />
         </Switch>
       </main>
