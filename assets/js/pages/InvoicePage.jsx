@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Field from "../components/forms/Field";
 import { Link } from "react-router-dom";
 import Select from "../components/forms/Select";
+import CustomersAPI from "../services/customersAPI";
 
 const InvoicePage = () => {
   const [invoice, setInvoice] = useState({
@@ -10,11 +11,26 @@ const InvoicePage = () => {
     status: "",
   });
 
+  const[customers, setCustomers] = useState([]);
+
   const [errors, setErrors] = useState({
     amount: "",
     customer: "",
     status: "",
   });
+
+  const fetchCustomers = async () => {
+    try {
+        const data =  await CustomersAPI.findAll();
+        setCustomers(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [])
 
   // Handle inputs change on form
   const handleChange = ({ currentTarget }) => {
@@ -42,8 +58,7 @@ const InvoicePage = () => {
           error={errors.customer}
           onChange={handleChange}
         >
-          <option value="1">Alban Renahy</option>
-          <option value="2">Agathe Pernin</option>
+          {customers.map(customer => <option key={customer.id} value={customer.id}>{customer.firstName} {customer.lastName}</option>)}
         </Select>
         <Select
           name="status"
