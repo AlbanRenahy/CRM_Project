@@ -53,12 +53,15 @@ const CustomerPage = (props) => {
           "https://127.0.0.1:8001/api/customers/" + id,
           customer
         );
-        console.log(response.data);
+        //TODO: Flash success notification
       } else {
         const response = await axios.post(
           "https://127.0.0.1:8001/api/customers",
           customer
         );
+
+        // TODO: Flash success notification
+        props.history.replace("/customers");
       }
       setErrors({});
     } catch (error) {
@@ -68,6 +71,7 @@ const CustomerPage = (props) => {
           apiErrors[violation.propertyPath] = violation.message;
         });
         setErrors(apiErrors);
+        // TODO: Flash errors notification
       }
     }
   };
