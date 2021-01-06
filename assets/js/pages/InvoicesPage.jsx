@@ -4,8 +4,6 @@ import axios from "axios";
 import moment from "moment";
 import { Link } from 'react-router-dom';
 
-import InvoicesAPI from "../services/invoicesAPI";
-
 const STATUS_CLASSES = {
   PAID: "success",
   SENT: "primary",
