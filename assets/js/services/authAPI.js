@@ -1,5 +1,10 @@
 import axios from "axios";
 
+function logout() {
+    window.localStorage.removeItem("authToken");
+    delete axios.defaults.headers["Authorization"];
+}
+
 function authenticate(credentials) {
   return axios
     .post("https://127.0.0.1:8001/api/login_check", credentials)
@@ -16,5 +21,6 @@ function authenticate(credentials) {
 }
 
 export default {
-    authenticate
+    authenticate,
+    logout
 }
