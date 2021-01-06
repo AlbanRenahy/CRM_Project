@@ -3,15 +3,16 @@ import Field from "../components/forms/Field";
 import { Link } from "react-router-dom";
 import Select from "../components/forms/Select";
 import CustomersAPI from "../services/customersAPI";
+import axios from "axios";
 
-const InvoicePage = () => {
+const InvoicePage = ({ history }) => {
   const [invoice, setInvoice] = useState({
     amount: "",
     customer: "",
-    status: "",
+    status: "SENT",
   });
 
-  const[customers, setCustomers] = useState([]);
+  const [customers, setCustomers] = useState([]);
 
   const [errors, setErrors] = useState({
     amount: "",
@@ -21,8 +22,9 @@ const InvoicePage = () => {
 
   const fetchCustomers = async () => {
     try {
-        const data =  await CustomersAPI.findAll();
-        setCustomers(data);
+      const data = await CustomersAPI.findAll();
+      setCustomers(data);
+      if (!invoice.customer) setInvoice({ ...invoice, customer: data[0].id });
     } catch (error) {
       console.log(error.response);
     }
@@ -30,18 +32,42 @@ const InvoicePage = () => {
 
   useEffect(() => {
     fetchCustomers();
-  }, [])
+  }, []);
 
   // Handle inputs change on form
   const handleChange = ({ currentTarget }) => {
     const { name, value } = currentTarget;
-    setInvoice({ ...customer, [name]: value });
+    setInvoice({ ...invoice, [name]: value });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post("https://127.0.0.1:8001/api/invoices", {
+        ...invoice,
+        customer: `/api/customers/${invoice.customer}`,
+      });
+      // TODO flash notif success
+      history.replace("/invoices");
+      console.log(response);
+    } catch ({ response }) {
+      const { violations } = response.data;
+      if (violations) {
+        const apiErrors = {};
+        violations.forEach(({ propertyPath, message }) => {
+          apiErrors[propertyPath] = message;
+        });
+        setErrors(apiErrors);
+        // TODO: Flash errors notification
+      }
+    }
   };
 
   return (
     <>
-      <h1>Création d'un facture</h1>
-      <form>
+      <h1>Création d'une facture</h1>
+      <form onSubmit={handleSubmit}>
         <Field
           name="amount"
           label="Montant"
@@ -58,7 +84,11 @@ const InvoicePage = () => {
           error={errors.customer}
           onChange={handleChange}
         >
-          {customers.map(customer => <option key={customer.id} value={customer.id}>{customer.firstName} {customer.lastName}</option>)}
+          {customers.map((customer) => (
+            <option key={customer.id} value={customer.id}>
+              {customer.firstName} {customer.lastName}
+            </option>
+          ))}
         </Select>
         <Select
           name="status"
