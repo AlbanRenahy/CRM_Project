@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AuthAPI from "../services/authAPI";
 
-const LoginPage = ({onLogin}) => {
+const LoginPage = ({onLogin, history }) => {
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
@@ -22,6 +22,7 @@ const LoginPage = ({onLogin}) => {
       await AuthAPI.authenticate(credentials);
       setError("");
       onLogin(true);
+      history.replace("/customers");
     } catch (error) {
       console.log(error.response);
       setError(
