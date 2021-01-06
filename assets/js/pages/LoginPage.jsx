@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import AuthAPI from "../services/authAPI";
 
 const LoginPage = (props) => {
   const [credentials, setCredentials] = useState({
@@ -6,17 +7,27 @@ const LoginPage = (props) => {
     password: "",
   });
 
-  const handleChange = (event) => {
-    const value = event.currentTarget.value;
-    const name = event.currentTarget.name;
+  const [error, setError] = useState("");
 
+  // Handle fields
+  const handleChange = ({ currentTarget }) => {
+    const { value, name } = currentTarget;
     setCredentials({ ...credentials, [name]: value });
   };
 
-  const handleSubmit = event => {
-      event.preventDefault();
-      console.log(credentials);
-  }
+  // Handle submit
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      await AuthAPI.authenticate(credentials);
+      setError("");
+    } catch (error) {
+      console.log(error.response);
+      setError(
+        "Aucun compte ne possède cette adresse email ou alors les informations ne correspondent pas"
+      );
+    }
+  };
 
   return (
     <>
@@ -31,8 +42,9 @@ const LoginPage = (props) => {
             placeholder="Adresse email de connexion"
             name="username"
             id="username"
-            className="form-control"
+            className={"form-control" + (error && " is-invalid")}
           />
+          {error && <p className="invalid-feedback">{error}</p>}
         </div>
         <div className="form-group">
           <label htmlFor="_password">Mot de passe</label>
