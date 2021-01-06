@@ -9,6 +9,9 @@ import HomePage from "./js/pages/HomePage";
 import CustomersPage from "./js/pages/CustomersPage";
 import InvoicesPage from "./js/pages/InvoicesPage";
 import LoginPage from "./js/pages/LoginPage";
+import AuthAPI from "./js/services/authAPI";
+
+AuthAPI.setup();
 
 const App = () => {
   return (
