@@ -16,7 +16,7 @@ const Navbar = ({ history }) => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <NavLink className="navbar-brand" to="#">
+      <NavLink className="navbar-brand" to="/">
         EasyFacture
       </NavLink>
       <button
