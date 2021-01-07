@@ -3,6 +3,7 @@ import Pagination from "../components/Pagination";
 import axios from "axios";
 import moment from "moment";
 import { Link } from 'react-router-dom';
+import { toast } from "react-toastify";
 
 const STATUS_CLASSES = {
   PAID: "success",
@@ -29,7 +30,7 @@ const InvoicesPage = (props) => {
         .then((response) => response.data["hydra:member"]);
       setInvoices(data);
     } catch (error) {
-      console.log(error.response);
+      toast.error("Erreur lors du chargement des factures")
     }
   };
 
@@ -55,8 +56,9 @@ const InvoicesPage = (props) => {
 
     try {
       await axios.delete("https://127.0.0.1:8001/api/invoices/" + id);
+      toast.success("La facture a bien été suppimée")
     } catch (error) {
-      console.log(error.response);
+      toast.error("Une erreur est survenue");
       setInvoices(originalInvoices);
     }
   };
